@@ -39,7 +39,7 @@ def show(txt: str, p: str, k: str) -> str:
 @start.handle()
 async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     global datas
-    if datas.get(event.group_id,None) == None:
+    if datas.get(event.group_id,None) != None:
         await start.finish('游戏已经开始了,输入"结束"结束游戏')
     if not arg:
         num = 10
