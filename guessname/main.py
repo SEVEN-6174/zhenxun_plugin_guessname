@@ -25,10 +25,10 @@ check2: Type[Matcher] = on_command('c', priority=5, block=True)
 stop: Type[Matcher] = on_command('结束', priority=5, block=True)
 
 
-def show(txt, p, k):
-    txt_ = txt
+def show(txt: str, p: str, k: str) -> str:
+    txt_: str = txt
     for i in range(txt.count(k)):
-        mov = len(txt)-len(txt_)
+        mov: int = len(txt)-len(txt_)
         p = [i for i in p]
         p[txt_.index(k)+mov:txt_.index(k)+len(k)+mov] = k
         p = ''.join(p)
@@ -49,7 +49,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
                 await start.finish('必须大于等于0哦')
         else:
             await start.finish('必须得是数字哦')
-    with open(data_path, 'r',encoding='utf-8') as f:
+    with open(data_path, 'r', encoding='utf-8') as f:
         txts = list(set(f.read().strip().split('\n')))
     random.shuffle(txts)
     if num > len(txts):
@@ -142,7 +142,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     song_id: int
     if song_id < 0 or song_id > len(txts):
         await check.finish('歌曲编号超出范围')
-    song_name = ' '.join(args[:-1])
+    song_name: str = ' '.join(args[:-1])
     count += 1
     ret = False
     if txts[song_id-1].lower() == song_name.lower() or txts[song_id-1].split('(')[0].strip().lower() == song_name.lower():
@@ -170,6 +170,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
         await check.finish(out)
     await check.finish('猜错了哦')
 
+
 @check2.handle()
 async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     global datas
@@ -196,7 +197,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     song_id: int
     if song_id < 0 or song_id > len(txts):
         await check2.finish('歌曲编号超出范围')
-    song_name = ' '.join(args[1:])
+    song_name: str = '.'.join(args[1:])
     count += 1
     ret = False
     if txts[song_id-1].lower() == song_name.lower() or txts[song_id-1].split('(')[0].strip().lower() == song_name.lower():
@@ -223,6 +224,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
         out = out.strip()
         await check2.finish(out)
     await check2.finish('猜错了哦')
+
 
 @stop.handle()
 async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
