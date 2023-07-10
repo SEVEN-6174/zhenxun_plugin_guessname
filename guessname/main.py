@@ -45,7 +45,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
         arg: str = arg.extract_plain_text().strip()
         if arg.isdecimal():
             num = int(arg)
-            if num < 0:
+            if num <= 0:
                 await start.finish('必须大于等于0哦')
         else:
             await start.finish('必须得是数字哦')
@@ -67,7 +67,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
             out += '\n'
         else:
             out += '✓\n'
-    out.strip()
+    out = out.strip()
     datas[event.group_id] = {'txts': txts,
                              'guess': guess, 'count': count, 'ps': ps, 'times': time.time(), 'sender': event.user_id}
     await start.finish(out)
