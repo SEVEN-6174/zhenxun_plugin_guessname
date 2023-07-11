@@ -1,4 +1,7 @@
-from nonebot import on_command
+from nonebot import (
+    on_command,
+    on_fullmatch
+)
 from nonebot.adapters.onebot.v11 import (
     GroupMessageEvent,
     MessageSegment,
@@ -22,7 +25,7 @@ start: Type[Matcher] = on_command('开字符', priority=5, block=True)
 gen: Type[Matcher] = on_command('k', aliases={'打开'}, priority=5, block=True)
 check: Type[Matcher] = on_command('验证', priority=5, block=True)
 check2: Type[Matcher] = on_command('c', priority=5, block=True)
-stop: Type[Matcher] = on_command('结束', priority=5, block=True)
+stop: Type[Matcher] = on_fullmatch('结束', priority=5, block=True)
 
 
 def show(txt: str, p: str, k: str) -> str:
@@ -39,7 +42,7 @@ def show(txt: str, p: str, k: str) -> str:
 @start.handle()
 async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     global datas
-    if datas.get(event.group_id,None) != None:
+    if datas.get(event.group_id, None) != None:
         await start.finish('游戏已经开始了,输入"结束"结束游戏')
     if not arg:
         num = 10
@@ -78,17 +81,22 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
 @gen.handle()
 async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     global datas
-    if datas.get(event.group_id, None) == None:
-        await gen.finish('还没开始哦，输入"开字符"开始')
+    mode: bool = True if datas.get(event.group_id, None) == None else False
     txts: List[str] = datas[event.group_id]['txts']
     guess: Set = datas[event.group_id]['guess']
     count: int = datas[event.group_id]['count']
     ps: List[str] = datas[event.group_id]['ps']
     times: float = datas[event.group_id]['times']
     sender: int = datas[event.group_id]['sender']
-    if not arg:
+    if (not arg) and (not mode):
         await gen.finish('开什么字符呢')
+    elif (not arg) and mode:
+        return
     args: str = arg.extract_plain_text().strip().split(' ')
+    if [len(i) != 1 for i in args] and mode:
+        return
+    elif [len(i) != 1 for i in args]:
+        await gen.finish('每个字符的长度只能是1')
     for k in args:
         if k == '':
             continue
@@ -121,21 +129,24 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
 @check.handle()
 async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     global datas
-    if datas.get(event.group_id, None) == None:
-        await check.finish('还没开始哦，输入"开字符"开始')
+    mode: bool = True if datas.get(event.group_id, None) == None else False
     txts: List[str] = datas[event.group_id]['txts']
     guess: Set = datas[event.group_id]['guess']
     count: int = datas[event.group_id]['count']
     ps: List[str] = datas[event.group_id]['ps']
     times: float = datas[event.group_id]['times']
     sender: int = datas[event.group_id]['sender']
-    if not arg:
+    if (not arg) and (not mode):
         await check.finish('要验证什么呢')
+    elif (not arg) and mode:
+        return
     args: List[str] = arg.extract_plain_text().strip().split(' ')
     while '' in args:
         args.remove('')
-    if len(args) == 1:
+    if len(args) == 1 and (not mode):
         await check.finish('参数数量不符')
+    elif len(args) == 1 and mode:
+        return
     song_id: str = args[-1]
     if song_id.isdecimal():
         song_id = int(song_id)
@@ -176,21 +187,24 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
 @check2.handle()
 async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     global datas
-    if datas.get(event.group_id, None) == None:
-        await check2.finish('还没开始哦，输入"开字符"开始')
+    mode = True if datas.get(event.group_id, None) == None else False
     txts: List[str] = datas[event.group_id]['txts']
     guess: Set = datas[event.group_id]['guess']
     count: int = datas[event.group_id]['count']
     ps: List[str] = datas[event.group_id]['ps']
     times: float = datas[event.group_id]['times']
     sender: int = datas[event.group_id]['sender']
-    if not arg:
+    if (not arg) and (not mode):
         await check2.finish('要验证什么呢')
+    elif (not arg) and mode:
+        return
     args: List[str] = arg.extract_plain_text().strip().split('.')
     while '' in args:
         args.remove('')
-    if len(args) == 1:
+    if len(args) == 1 and (not mode):
         await check2.finish('参数数量不符')
+    elif len(args) == 1 and mode:
+        return
     song_id: str = args[0]
     if song_id.isdecimal():
         song_id = int(song_id)
@@ -229,16 +243,17 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
 
 
 @stop.handle()
-async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
+async def _(event: GroupMessageEvent) -> None:
     global datas
-    if datas.get(event.group_id, None) == None:
-        await stop.finish('还没开始哦，输入"开字符"开始')
+    mode = True if datas.get(event.group_id, None) == None else False
     txts: List[str] = datas[event.group_id]['txts']
     guess: Set = datas[event.group_id]['guess']
     count: int = datas[event.group_id]['count']
     ps: List[str] = datas[event.group_id]['ps']
     times: float = datas[event.group_id]['times']
     sender: int = datas[event.group_id]['sender']
+    if mode:
+        return
     if event.user_id == sender or (time.time() - times) > len(txts) * 60:
         out = ''
         out += '已猜'+','.join(guess)+'\n'
