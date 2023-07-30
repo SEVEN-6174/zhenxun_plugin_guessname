@@ -199,8 +199,6 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     elif (not arg) and mode:
         return
     args: List[str] = arg.extract_plain_text().strip().split('.')
-    while '' in args:
-        args.remove('')
     if len(args) == 1 and (not mode):
         await check2.finish('参数数量不符')
     elif len(args) == 1 and mode:
