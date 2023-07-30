@@ -74,7 +74,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
             out += '✓\n'
     out = out.strip()
     datas[event.group_id] = {'txts': txts,
-                             'guess': guess, 'count': count, 'ps': ps, 'times': time.time(), 'sender': event.user_id}
+                             'guess': guess, 'count': count, 'ps': ps, 'times': time.time(), 'sender': event.user_id, 'hide': len(txts)>20}
     await start.finish(out)
 
 
@@ -88,6 +88,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     ps: List[str] = datas[event.group_id]['ps']
     times: float = datas[event.group_id]['times']
     sender: int = datas[event.group_id]['sender']
+    hide: bool = datas[event.group_id]['hide']
     if (not arg) and (not mode):
         await gen.finish('开什么字符呢')
     elif (not arg) and mode:
@@ -106,10 +107,12 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
             ps[i] = show(txts[i], ps[i], k.lower())
             ps[i] = show(txts[i], ps[i], k.upper())
             datas[event.group_id] = {'txts': txts,
-                                     'guess': guess, 'count': count, 'ps': ps, 'times': times, 'sender': sender}
+                                     'guess': guess, 'count': count, 'ps': ps, 'times': times, 'sender': sender, 'hide': hide}
     out: Literal[''] = ''
     out += '已猜'+','.join(guess)+'\n'
     for i in range(len(ps)):
+        if hide and (ps[i] == txts[i]):
+            continue
         out += str(i+1)+'.'
         out += ps[i]
         if ps[i] != txts[i]:
@@ -136,6 +139,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     ps: List[str] = datas[event.group_id]['ps']
     times: float = datas[event.group_id]['times']
     sender: int = datas[event.group_id]['sender']
+    hide: bool = datas[event.group_id]['hide']
     if (not arg) and (not mode):
         await check.finish('要验证什么呢')
     elif (not arg) and mode:
@@ -162,11 +166,13 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
         ps[song_id-1] = txts[song_id-1]
         ret = True
     datas[event.group_id] = {'txts': txts,
-                             'guess': guess, 'count': count, 'ps': ps, 'times': times, 'sender': sender}
+                             'guess': guess, 'count': count, 'ps': ps, 'times': times, 'sender': sender, 'hide': hide}
     if ret:
         out: Literal[''] = ''
         out += '正确,已猜'+','.join(guess)+'\n'
         for i in range(len(ps)):
+            if hide and (ps[i] == txts[i]):
+                continue
             out += str(i+1)+'.'
             out += ps[i]
             if ps[i] != txts[i]:
@@ -194,6 +200,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     ps: List[str] = datas[event.group_id]['ps']
     times: float = datas[event.group_id]['times']
     sender: int = datas[event.group_id]['sender']
+    hide: bool = datas[event.group_id]['hide']
     if (not arg) and (not mode):
         await check2.finish('要验证什么呢')
     elif (not arg) and mode:
@@ -218,11 +225,13 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
         ps[song_id-1] = txts[song_id-1]
         ret = True
     datas[event.group_id] = {'txts': txts,
-                             'guess': guess, 'count': count, 'ps': ps, 'times': times, 'sender': sender}
+                             'guess': guess, 'count': count, 'ps': ps, 'times': times, 'sender': sender, 'hide': hide}
     if ret:
         out: Literal[''] = ''
         out += '正确,已猜'+','.join(guess)+'\n'
         for i in range(len(ps)):
+            if hide and (ps[i] == txts[i]):
+                continue
             out += str(i+1)+'.'
             out += ps[i]
             if ps[i] != txts[i]:
@@ -250,6 +259,7 @@ async def _(event: GroupMessageEvent) -> None:
     ps: List[str] = datas[event.group_id]['ps']
     times: float = datas[event.group_id]['times']
     sender: int = datas[event.group_id]['sender']
+    hide: bool = datas[event.group_id]['hide']
     if mode:
         return
     if event.user_id == sender or (time.time() - times) > len(txts) * 60:
