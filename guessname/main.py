@@ -94,9 +94,9 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     elif (not arg) and mode:
         return
     args: str = arg.extract_plain_text().strip().split(' ')
-    if any([len(i) != 1 for i in args]) and mode:
+    if any([len(i) > 1 for i in args]) and mode:
         return
-    elif any([len(i) != 1 for i in args]):
+    elif any([len(i) > 1 for i in args]):
         await gen.finish('每个字符的长度只能是1')
     for k in args:
         if k == '':
