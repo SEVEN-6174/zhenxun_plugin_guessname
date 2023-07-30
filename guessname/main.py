@@ -51,7 +51,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
         if arg.isdecimal():
             num = int(arg)
             if num <= 0:
-                await start.finish('必须大于等于0哦')
+                await start.finish('必须大于0哦')
         else:
             await start.finish('必须得是数字哦')
     with open(data_path, 'r', encoding='utf-8') as f:
