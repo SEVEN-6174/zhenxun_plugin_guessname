@@ -47,20 +47,13 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
     if not arg:
         num = 10
     else:
-        arg: str = arg.extract_plain_text().strip().split[' ']
-        if arg.isdecimal():
+        arg: str = arg.extract_plain_text().strip().split(' ')
+        if arg[0].isdecimal():
             num = int(arg[0])
             if num <= 0:
                 await start.finish('必须大于0哦')
         else:
             await start.finish('必须得是数字哦')
-    if len(arg) > 1:
-        if arg[1] == 'show':
-            hide = False
-        elif arg[1] == 'hide':
-            hide = True
-        else:
-            hide = len(txts)>20
     with open(data_path, 'r', encoding='utf-8') as f:
         txts = list(set(f.read().strip().split('\n')))
     random.shuffle(txts)
@@ -80,6 +73,15 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()) -> None:
         else:
             out += '✓\n'
     out = out.strip()
+    if len(arg) > 1:
+        if arg[1] == 'show':
+            hide = False
+        elif arg[1] == 'hide':
+            hide = True
+        else:
+            hide = len(txts)>20
+    else:
+        hide = len(txts)>20
     datas[event.group_id] = {'txts': txts,
                              'guess': guess, 'count': count, 'ps': ps, 'times': time.time(), 'sender': event.user_id, 'hide': hide}
     await start.finish(out)
